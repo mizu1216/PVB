@@ -1,0 +1,91 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local StarterGui = game:GetService("StarterGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextChatService = game:GetService("TextChatService")
+local LocalPlayer = Players.LocalPlayer
+
+local commandUsers = {"mizu1216dao", "unti1101"}
+local rejoinTargets = {"tokagemann7", "nazeelephantataru"}
+
+-- 起動通知
+pcall(function()
+	StarterGui:SetCore("SendNotification", {
+		Title = "Success",
+		Text = "Script loaded successfully.",
+		Duration = 3
+	})
+end)
+
+-- 指定ユーザーかチェック
+local function isCommandUser(name)
+	for _, u in ipairs(commandUsers) do
+		if name == u then
+			return true
+		end
+	end
+	return false
+end
+
+-- 名前からプレイヤー取得
+local function getPlayersByNames(names)
+	local result = {}
+	for _, plr in ipairs(Players:GetPlayers()) do
+		for _, name in ipairs(names) do
+			if plr.Name == name then
+				table.insert(result, plr)
+			end
+		end
+	end
+	return result
+end
+
+-- コマンド処理
+local function executeCommand(sender, message)
+	if not isCommandUser(sender) then return end
+	message = string.lower(message)
+
+	-- :rejoin
+	if string.find(message, ":rejoin") then
+		for _, target in ipairs(getPlayersByNames(rejoinTargets)) do
+			task.spawn(function()
+				TeleportService:Teleport(game.PlaceId, target)
+			end)
+		end
+	end
+
+	-- :keystock
+	for num in string.gmatch(message, ":keystock%s*(%d+)") do
+		if LocalPlayer then
+			StarterGui:SetCore("SendNotification", {
+				Title = "残りのキーストック",
+				Text = tostring(num),
+				Duration = 3
+			})
+		end
+	end
+end
+
+-- 新チャット対応
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+	TextChatService.MessageReceived:Connect(function(msg)
+		if msg and msg.TextSource then
+			executeCommand(msg.TextSource.Name, msg.Text)
+		end
+	end)
+else
+	-- 旧チャット対応
+	local chatFolder = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+	if chatFolder then
+		local event = chatFolder:FindFirstChild("OnMessageDoneFiltering")
+		if event then
+			event.OnClientEvent:Connect(function(data)
+				if data and data.FromSpeaker and data.Message then
+					executeCommand(data.FromSpeaker, data.Message)
+				end
+			end)
+		end
+	end
+end
