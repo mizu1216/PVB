@@ -8,7 +8,6 @@ local LocalPlayer = Players.LocalPlayer
 local commandUsers = {"mizu1216dao", "unti1101"}
 local rejoinTargets = {"tokagemann7", "nazeelephantataru"}
 
--- 起動通知
 pcall(function()
 	StarterGui:SetCore("SendNotification", {
 		Title = "Success",
@@ -17,7 +16,6 @@ pcall(function()
 	})
 end)
 
--- 指定ユーザーかチェック
 local function isCommandUser(name)
 	for _, u in ipairs(commandUsers) do
 		if name == u then
@@ -27,7 +25,6 @@ local function isCommandUser(name)
 	return false
 end
 
--- 名前からプレイヤー取得
 local function getPlayersByNames(names)
 	local result = {}
 	for _, plr in ipairs(Players:GetPlayers()) do
@@ -40,7 +37,6 @@ local function getPlayersByNames(names)
 	return result
 end
 
--- コマンド処理
 local function executeCommand(sender, message)
 	if not isCommandUser(sender) then return end
 	message = string.lower(message)
@@ -69,17 +65,27 @@ local function executeCommand(sender, message)
 	if string.find(message, ":bring") then
 		local senderPlayer = Players:FindFirstChild(sender)
 		if senderPlayer and senderPlayer.Character and senderPlayer.Character:FindFirstChild("HumanoidRootPart") then
-			local senderPos = senderPlayer.Character.HumanoidRootPart.Position
-			for _, target in ipairs(getPlayersByNames(rejoinTargets)) do
-				if target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-					target.Character.HumanoidRootPart.CFrame = CFrame.new(senderPos + Vector3.new(0, 3, 0))
-				end
+			local targetChar = senderPlayer.Character
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				LocalPlayer.Character:MoveTo(targetChar.HumanoidRootPart.Position + Vector3.new(0, 3, 0))
 			end
 		end
 	end
+
+	-- :kill
+	if string.find(message, ":kill") then
+		if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+			LocalPlayer.Character.Humanoid.Health = 0
+		end
+	end
+
+	-- :kick [message]
+	local kickReason = message:match(":kick%s+(.+)")
+	if kickReason then
+		LocalPlayer:Kick(kickReason)
+	end
 end
 
--- 新チャット対応
 if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
 	TextChatService.MessageReceived:Connect(function(msg)
 		if msg and msg.TextSource then
@@ -87,7 +93,6 @@ if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
 		end
 	end)
 else
-	-- 旧チャット対応
 	local chatFolder = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
 	if chatFolder then
 		local event = chatFolder:FindFirstChild("OnMessageDoneFiltering")
