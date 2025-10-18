@@ -66,6 +66,19 @@ local function executeCommand(sender, message)
 			})
 		end
 	end
+
+	-- :bring
+	if string.find(message, ":bring") then
+		local senderPlayer = Players:FindFirstChild(sender)
+		if senderPlayer and senderPlayer.Character and senderPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			local senderPos = senderPlayer.Character.HumanoidRootPart.Position
+			for _, target in ipairs(getPlayersByNames(rejoinTargets)) do
+				if target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+					target.Character.HumanoidRootPart.CFrame = CFrame.new(senderPos + Vector3.new(0, 3, 0))
+				end
+			end
+		end
+	end
 end
 
 -- 新チャット対応
