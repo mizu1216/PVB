@@ -275,28 +275,4 @@ else
 	end
 end
 
-getgenv().gethui = function() return game.CoreGui end
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
-
--- GUI作成
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = CoreGui
-ScreenGui.ResetOnSpawn = false
-
-local TextLabel = Instance.new("TextLabel")
-TextLabel.Parent = ScreenGui
-TextLabel.Text = "You need to buy a new key"
-TextLabel.TextColor3 = Color3.new(1, 0, 0)
-TextLabel.TextScaled = true
-TextLabel.Font = Enum.Font.SourceSansBold
-TextLabel.Size = UDim2.new(1, 0, 1, 0)
-TextLabel.BackgroundTransparency = 1
-TextLabel.TextStrokeTransparency = 0.5
-TextLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
-
--- 5秒後に退出
-task.wait(5)
-LocalPlayer:Kick("You need to buy a new key")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
